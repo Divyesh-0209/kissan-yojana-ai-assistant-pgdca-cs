@@ -1,9 +1,13 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Flask Chatbot</title>
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -14,17 +18,19 @@
             height: 100vh;
             margin: 0;
         }
+
         #chat-container {
             width: 400px;
             max-width: 90%;
             height: 500px;
             background: #ffffff;
             border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             display: flex;
             flex-direction: column;
             overflow: hidden;
         }
+
         #chat-header {
             background-color: #007bff;
             color: white;
@@ -33,6 +39,7 @@
             font-weight: bold;
             font-size: 1.1em;
         }
+
         #chat-box {
             flex: 1;
             padding: 15px;
@@ -41,6 +48,7 @@
             flex-direction: column;
             gap: 10px;
         }
+
         .message {
             max-width: 75%;
             padding: 10px 14px;
@@ -48,32 +56,37 @@
             font-size: 0.95em;
             line-height: 1.4;
         }
+
         .user-message {
             background-color: #007bff;
             color: white;
             align-self: flex-end;
             border-bottom-right-radius: 2px;
         }
+
         .bot-message {
             background-color: #e9ecef;
             color: #333;
             align-self: flex-start;
             border-bottom-left-radius: 2px;
         }
+
         #input-container {
             display: flex;
             border-top: 1px solid #ddd;
             padding: 10px;
             background: #fff;
         }
+
         #user-input {
             flex: 1;
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 4px;
             outline: none;
-            font-size: 10px;
+            font-size: 16px;
         }
+
         #send-btn {
             background-color: #007bff;
             color: white;
@@ -84,64 +97,162 @@
             cursor: pointer;
             font-weight: bold;
         }
+
         #send-btn:hover {
             background-color: #0056b3;
         }
+
+        #send-btn:disabled {
+            background-color: #999;
+            cursor: not-allowed;
+        }
     </style>
 </head>
+
 <body>
 
-<div id="chat-container">
-    <div id="chat-header">AI Chatbot Support</div>
-    <div id="chat-box">
-        <div class="message bot-message">Hello! How can I help you today?</div>
+    <div id="chat-container">
+
+        <div id="chat-header">
+            AI Chatbot Support
+        </div>
+
+        <div id="chat-box">
+            <div class="message bot-message">
+                Hello! How can I help you today?
+            </div>
+        </div>
+
+        <div id="input-container">
+            <input
+                type="text"
+                id="user-input"
+                placeholder="Type a message..."
+                autocomplete="off"
+            >
+
+            <button id="send-btn">
+                Send
+            </button>
+        </div>
+
     </div>
-    <div id="input-container">
-        <input type="text" id="user-input" placeholder="Type a message..." autocomplete="off">
-        <button id="send-btn">Send</button>
-    </div>
-</div>
 
-<script>
-    const chatBox = document.getElementById('chat-box');
-    const userInput = document.getElementById('user-input');
-    const sendBtn = document.getElementById('send-btn');
+    <script>
+        const chatBox = document.getElementById("chat-box");
+        const userInput = document.getElementById("user-input");
+        const sendBtn = document.getElementById("send-btn");
 
-    // Function to append message bubbles to the chat layout
-    function appendMessage(text, sender) {
-        const messageDiv = document.createElement('div');
-        messageDiv.classList.add('message', sender === 'user' ? 'user-message' : 'bot-message');
-        messageDiv.textContent = text;
-        chatBox.appendChild(messageDiv);
-        chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to the bottom
-    }
+        // Add a message to the chat box
+        function appendMessage(text, sender) {
 
-    // Function to handle sending message payload to Flask backend
-    async function sendMessage() {
-        const messageText = userInput.value.trim();
-        if (!messageText) return;
+            const messageDiv = document.createElement("div");
 
-        // 1. Show user's message immediately on UI
-        appendMessage(messageText, 'user');
-        userInput.value = '';
+            messageDiv.classList.add(
+                "message",
+                sender === "user"
+                    ? "user-message"
+                    : "bot-message"
+            );
 
-        try {
-            // 2. Post JSON payload to the Flask endpoint /get_response
-            const response = await fetch('/get_response', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ message: messageText })
-            });
+            messageDiv.textContent = text;
 
-            if (!response.ok) throw new Error('Network error');
+            chatBox.appendChild(messageDiv);
 
-            const data = await response.json();
-            
-            // 3. Render the bot's response received from Flask
-            appendMessage(data.reply, 'bot');
+            // Scroll to the latest message
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
 
-        </script>
+
+        // Send message to Flask backend
+        async function sendMessage() {
+
+            const messageText = userInput.value.trim();
+
+            // Do nothing if input is empty
+            if (!messageText) {
+                return;
+            }
+
+            // Display user's message
+            appendMessage(messageText, "user");
+
+            // Clear input box
+            userInput.value = "";
+
+            // Disable button while waiting
+            sendBtn.disabled = true;
+
+            try {
+
+                // Send request to Flask
+                const response = await fetch("/get_response", {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        message: messageText
+                    })
+                });
+
+
+                // Check HTTP response
+                if (!response.ok) {
+                    throw new Error(
+                        `HTTP error: ${response.status}`
+                    );
+                }
+
+
+                // Convert response to JSON
+                const data = await response.json();
+
+
+                // Display bot response
+                appendMessage(
+                    data.reply,
+                    "bot"
+                );
+
+            } catch (error) {
+
+                console.error("Error:", error);
+
+                // Display error message
+                appendMessage(
+                    "Sorry, something went wrong. Please try again.",
+                    "bot"
+                );
+
+            } finally {
+
+                // Enable button again
+                sendBtn.disabled = false;
+
+                // Put cursor back in input
+                userInput.focus();
+            }
+        }
+
+
+        // Send when button is clicked
+        sendBtn.addEventListener("click", sendMessage);
+
+
+        // Send when Enter key is pressed
+        userInput.addEventListener("keydown", function (event) {
+
+            if (event.key === "Enter") {
+                sendMessage();
+            }
+
+        });
+    </script>
+
 </body>
+
 </html>
