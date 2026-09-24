@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 
@@ -6,17 +5,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Flask Chatbot</title>
+    <title>Kissan Yojana Chatbot</title>
 
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f7f6;
+            /* background-color: #f4f7f6; */
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
+            background-image: url("{{ url_for('static', filename='images/images.jpg') }}");
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: cover;
+            background-attachment: fixed;
         }
 
         #chat-container {
@@ -32,7 +36,7 @@
         }
 
         #chat-header {
-            background-color: #007bff;
+            background-color: rgb(5, 181, 5);
             color: white;
             padding: 15px;
             text-align: center;
@@ -58,7 +62,7 @@
         }
 
         .user-message {
-            background-color: #007bff;
+            background-color: rgb(5, 181, 5);
             color: white;
             align-self: flex-end;
             border-bottom-right-radius: 2px;
@@ -88,7 +92,7 @@
         }
 
         #send-btn {
-            background-color: #007bff;
+            background-color: rgb(5, 181, 5);
             color: white;
             border: none;
             padding: 10px 15px;
@@ -114,7 +118,7 @@
     <div id="chat-container">
 
         <div id="chat-header">
-            AI Chatbot Support
+            Kissan Yojana Chatbot
         </div>
 
         <div id="chat-box">
@@ -137,6 +141,8 @@
         </div>
 
     </div>
+
+    <script src="https://jsdelivr.net"></script>
 
     <script>
         const chatBox = document.getElementById("chat-box");
