@@ -54,6 +54,8 @@ def chroma_collection():
 
         if COLLECTION:
             return COLLECTION
+        else:
+            raise Exception("Chroma collection failed.")
 
     except Exception as e:
         print("ERROR:",e)
